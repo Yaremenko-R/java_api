@@ -1,7 +1,10 @@
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HelloWorldTest {
 
@@ -49,5 +52,44 @@ public class HelloWorldTest {
             System.out.println(statusCode);
             url = locationHeader;
         }
+    }
+
+    @Test
+    public void testToken() throws InterruptedException {
+
+        JsonPath response1 = RestAssured
+                .get("https://playground.learnqa.ru/ajax/api/longtime_job")
+                .jsonPath();
+
+        String token = response1.getString("token");
+        int timeToReady = response1.getInt("seconds");
+        System.out.println((token));
+        System.out.println((timeToReady));
+
+        JsonPath response2 = RestAssured
+                .given()
+                .queryParam("token", token)
+                .get("https://playground.learnqa.ru/ajax/api/longtime_job")
+                .jsonPath();
+
+        String statusNotReady = response2.getString("status");
+        assertEquals("Job is NOT ready", statusNotReady);
+        System.out.println((statusNotReady));
+
+        Thread.sleep(timeToReady * 1000L);
+
+        JsonPath response3 = RestAssured
+                .given()
+                .queryParam("token", token)
+                .get("https://playground.learnqa.ru/ajax/api/longtime_job")
+                .jsonPath();
+
+        String statusReady = response3.getString("status");
+        assertEquals("Job is ready", statusReady);
+        System.out.println((statusReady));
+
+        String result = response3.getString("result");
+        Assertions.assertFalse(result.isEmpty());
+        System.out.println((result));
     }
 }
