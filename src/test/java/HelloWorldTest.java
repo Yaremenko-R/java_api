@@ -29,4 +29,25 @@ public class HelloWorldTest {
         System.out.println(locationHeader);
 
     }
+
+    @Test
+    public void testLongRedirect() {
+        int statusCode = 0;
+        String url = "https://playground.learnqa.ru/api/long_redirect";
+
+        while (statusCode != 200) {
+            Response response = RestAssured
+                    .given()
+                    .redirects()
+                    .follow(false)
+                    .get(url)
+                    .andReturn();
+
+            String locationHeader = response.getHeader("Location");
+            statusCode = response.getStatusCode();
+            System.out.println(locationHeader);
+            System.out.println(statusCode);
+            url = locationHeader;
+        }
+    }
 }
