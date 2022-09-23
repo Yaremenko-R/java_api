@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HelloWorldTest {
 
@@ -151,5 +152,11 @@ public class HelloWorldTest {
                 responseForCheckAuthCookie.print();
             };
         }
+    }
+
+    @Test
+    public void testCheckLength() {
+        String text = "Tra lala lala lala";
+        assertTrue(text.length() > 15,"The text should be greater than 15 chars, current length: " + text.length());
     }
 }
