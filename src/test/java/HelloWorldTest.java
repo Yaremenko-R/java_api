@@ -171,4 +171,16 @@ public class HelloWorldTest {
         String responseCookie = responseGetCookie.getCookie("HomeWork");
         assertEquals("hw_value", responseCookie, "Wrong cookie");
     }
+
+    @Test
+    public void testGetHeader() {
+
+        Response responseGetHeader = RestAssured
+                .given()
+                .get("https://playground.learnqa.ru/api/homework_header")
+                .andReturn();
+
+        String responseHeader = responseGetHeader.getHeader("x-secret-homework-header");
+        assertEquals("Some secret value", responseHeader, "Wrong header");
+    }
 }
