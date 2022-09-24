@@ -138,7 +138,7 @@ public class HelloWorldTest {
 
             String responseCookie = responseForGetAuthCookie.getCookie("auth_cookie");
             Map<String, String> cookies = new HashMap<>();
-            cookies.put("auth_cookie",responseCookie);
+            cookies.put("auth_cookie", responseCookie);
 
             Response responseForCheckAuthCookie = RestAssured
                     .given()
@@ -150,13 +150,25 @@ public class HelloWorldTest {
             if (responseForCheckAuthCookie.getBody().asString().contentEquals("You are authorized")) {
                 System.out.println(password);
                 responseForCheckAuthCookie.print();
-            };
+            }
         }
     }
 
     @Test
     public void testCheckLength() {
         String text = "Tra lala lala lala";
-        assertTrue(text.length() > 15,"The text should be greater than 15 chars, current length: " + text.length());
+        assertTrue(text.length() > 15, "The text should be greater than 15 chars, current length: " + text.length());
+    }
+
+    @Test
+    public void testGetCookie() {
+
+        Response responseGetCookie = RestAssured
+                .given()
+                .get("https://playground.learnqa.ru/api/homework_cookie")
+                .andReturn();
+
+        String responseCookie = responseGetCookie.getCookie("HomeWork");
+        assertEquals("hw_value", responseCookie, "Wrong cookie");
     }
 }
