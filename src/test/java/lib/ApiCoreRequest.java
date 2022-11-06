@@ -37,6 +37,14 @@ public class ApiCoreRequest {
                 .andReturn();
     }
 
+    @Step("Make a GET-request without token and cookie")
+    public Response makeGetRequestWithoutTokenAndCookie(String url) {
+        return given()
+                .filter(new AllureRestAssured())
+                .get(url)
+                .andReturn();
+    }
+
     @Step("Make a POST-request")
     public Response makePostRequest(String url, Map<String, String> authData) {
         return given()
