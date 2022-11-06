@@ -70,9 +70,8 @@ public class UserRegisterTest extends BaseTestCase {
             throw new IllegalArgumentException("Condition value is unknown: " + condition);
         }
 
-        Response responseCreateAuth = apiCoreRequest.makePostRequest(
-                "https://playground.learnqa.ru/api/user",
-                userData);
+        Response responseCreateAuth = apiCoreRequest
+                .makePostRequest("https://playground.learnqa.ru/api/user", userData);
 
         Assertions.assertResponseCodeEquals(responseCreateAuth, 400);
         Assertions.assertResponseTextEquals(responseCreateAuth, "The following required params are missed: " + condition);
@@ -85,9 +84,8 @@ public class UserRegisterTest extends BaseTestCase {
         userData.put("username", username);
         userData = DataGenerator.getRegistrationData(userData);
 
-        Response responseCreateAuth = apiCoreRequest.makePostRequest(
-                "https://playground.learnqa.ru/api/user",
-                userData);
+        Response responseCreateAuth = apiCoreRequest
+                .makePostRequest("https://playground.learnqa.ru/api/user", userData);
 
         Assertions.assertResponseCodeEquals(responseCreateAuth, 400);
         Assertions.assertResponseTextEquals(responseCreateAuth, "The value of 'username' field is too short");
@@ -100,9 +98,8 @@ public class UserRegisterTest extends BaseTestCase {
         userData.put("username", username);
         userData = DataGenerator.getRegistrationData(userData);
 
-        Response responseCreateAuth = apiCoreRequest.makePostRequest(
-                "https://playground.learnqa.ru/api/user",
-                userData);
+        Response responseCreateAuth = apiCoreRequest
+                .makePostRequest("https://playground.learnqa.ru/api/user", userData);
 
         Assertions.assertResponseCodeEquals(responseCreateAuth, 400);
         Assertions.assertResponseTextEquals(responseCreateAuth, "The value of 'username' field is too long");

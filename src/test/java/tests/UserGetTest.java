@@ -1,7 +1,7 @@
 package tests;
 
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import lib.ApiCoreRequest;
 import lib.Assertions;
 import lib.BaseTestCase;
 import org.junit.jupiter.api.Test;
@@ -11,16 +11,16 @@ import java.util.Map;
 
 public class UserGetTest extends BaseTestCase {
 
+    private final ApiCoreRequest apiCoreRequest = new ApiCoreRequest();
+
     @Test
     public void testGetUserDataNotAuth() {
-        Response responseUserData = RestAssured
-                .get("https://playground.learnqa.ru/api/user/2")
-                .andReturn();
+        Response responseUserData = apiCoreRequest
+                .makeGetRequestWithoutTokenAndCookie("https://playground.learnqa.ru/api/user/2");
 
         Assertions.assertJsonHasField(responseUserData, "username");
-        Assertions.assertJsonHasNotField(responseUserData, "firstName");
-        Assertions.assertJsonHasNotField(responseUserData, "lastName");
-        Assertions.assertJsonHasNotField(responseUserData, "email");
+        String[] unexpectedFields = {"firstName", "lastName", "email"};
+        Assertions.assertJsonHasNotFields(responseUserData, unexpectedFields);
     }
 
     @Test
@@ -29,22 +29,16 @@ public class UserGetTest extends BaseTestCase {
         authData.put("email", "vinkotov@example.com");
         authData.put("password", "1234");
 
-        Response responseCreateAuth = RestAssured
-                .given()
-                .body(authData)
-                .post("https://playground.learnqa.ru/api/user/login")
-                .andReturn();
+        Response responseCreateAuth = apiCoreRequest
+                .makePostRequest("https://playground.learnqa.ru/api/user/login", authData);
 
         String header = this.getHeader(responseCreateAuth, "x-csrf-token");
         String cookie = this.getCookie(responseCreateAuth, "auth_sid");
 
-        Response responseUserData = RestAssured
-                .given()
-                .header("x-csrf-token", header)
-                .cookie("auth_sid", cookie)
-                .body(authData)
-                .get("https://playground.learnqa.ru/api/user/2")
-                .andReturn();
+        Response responseUserData = apiCoreRequest
+                .makeGetRequest("https://playground.learnqa.ru/api/user/2",
+                        header,
+                        cookie);
 
         String[] expectedFields = {"username", "firstName", "lastName", "email"};
         Assertions.assertJsonHasFields(responseUserData, expectedFields);
