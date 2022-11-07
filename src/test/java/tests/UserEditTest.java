@@ -59,4 +59,30 @@ public class UserEditTest extends BaseTestCase {
 
         Assertions.assertJsonByName(responseUserData, "firstName", newName);
     }
+
+    @Test
+    public void testEditUserWithoutAuth() {
+        //GENERATE USER
+        Map<String, String> userData = DataGenerator.getRegistrationData();
+
+        JsonPath responseCreateAuth = RestAssured
+                .given()
+                .body(userData)
+                .post("https://playground.learnqa.ru/api/user/")
+                .jsonPath();
+
+        String userId = responseCreateAuth.getString("id");
+        String currentName = responseCreateAuth.getString("firstName");
+
+        //EDIT
+        String newName = "Changed Name";
+        Map<String, String> editData = new HashMap<>();
+        editData.put("firstName", newName);
+
+        Response responseEditUser = apiCoreRequest
+                .makePutRequestWithoutTokenAndCookie("https://playground.learnqa.ru/api/user/" + userId, editData);
+
+        Assertions.assertResponseCodeEquals(responseEditUser, 400);
+        Assertions.assertResponseTextEquals(responseEditUser, "Auth token not supplied");
+    }
 }
