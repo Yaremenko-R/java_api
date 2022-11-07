@@ -1,5 +1,6 @@
 package tests;
 
+import io.qameta.allure.*;
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
@@ -7,16 +8,22 @@ import lib.ApiCoreRequest;
 import lib.Assertions;
 import lib.BaseTestCase;
 import lib.DataGenerator;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Epic("Tests for editing user details")
 public class UserEditTest extends BaseTestCase {
 
     private final ApiCoreRequest apiCoreRequest = new ApiCoreRequest();
 
     @Test
+    @DisplayName("Editing user details with auth(positive)")
+    @Description("User trying to edit the same user details with token and cookie")
+    @Step("Starting test testEditJustCreatedUser")
+    @Severity(value = SeverityLevel.BLOCKER)
     public void testEditJustCreatedUser() {
         //GENERATE USER
         Map<String, String> userData = DataGenerator.getRegistrationData();
@@ -61,6 +68,10 @@ public class UserEditTest extends BaseTestCase {
     }
 
     @Test
+    @DisplayName("Editing user details without auth(negative)")
+    @Description("User trying to edit the same user details without token and cookie")
+    @Step("Starting test testEditUserWithoutAuth")
+    @Severity(value = SeverityLevel.BLOCKER)
     public void testEditUserWithoutAuth() {
         //GENERATE USER
         Map<String, String> userData = DataGenerator.getRegistrationData();
@@ -86,6 +97,10 @@ public class UserEditTest extends BaseTestCase {
     }
 
     @Test
+    @DisplayName("Editing user details of another user without auth(negative)")
+    @Description("User trying to edit another user details with token and cookie")
+    @Step("Starting test testEditUserByAnotherUser")
+    @Severity(value = SeverityLevel.BLOCKER)
     public void testEditUserByAnotherUser() {
         //GENERATE FIRST USER
         Map<String, String> userData1 = DataGenerator.getRegistrationData();
@@ -171,6 +186,10 @@ public class UserEditTest extends BaseTestCase {
     }
 
     @Test
+    @DisplayName("Editing user details, changing email for incorrect(without @) with auth(negative)")
+    @Description("User trying to edit user email for incorrect with token and cookie")
+    @Step("Starting test testEditUserEmailWithAuth")
+    @Severity(value = SeverityLevel.BLOCKER)
     public void testEditUserEmailWithAuth() {
         //GENERATE USER
         Map<String, String> userData = DataGenerator.getRegistrationData();
@@ -216,6 +235,10 @@ public class UserEditTest extends BaseTestCase {
     }
 
     @Test
+    @DisplayName("Editing user details, changing firstname to incorrect(1 symbol) with auth(negative)")
+    @Description("User trying to edit user name for incorrect with token and cookie")
+    @Step("Starting test testEditUserFirstName")
+    @Severity(value = SeverityLevel.BLOCKER)
     public void testEditUserFirstName() {
         //GENERATE USER
         Map<String, String> userData = DataGenerator.getRegistrationData();

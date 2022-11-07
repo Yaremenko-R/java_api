@@ -1,5 +1,6 @@
 package tests;
 
+import io.qameta.allure.*;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -7,6 +8,7 @@ import lib.ApiCoreRequest;
 import lib.Assertions;
 import lib.BaseTestCase;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -14,6 +16,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.util.HashMap;
 import java.util.Map;
 
+@Epic("Tests for authentication")
 public class UserAuthTest extends BaseTestCase {
     String cookie;
     String header;
@@ -35,6 +38,10 @@ public class UserAuthTest extends BaseTestCase {
     }
 
     @Test
+    @DisplayName("User authentication test(positive)")
+    @Description("Registered user trying to authenticate with correct login and password")
+    @Step("Starting test testAuthUser")
+    @Severity(value = SeverityLevel.BLOCKER)
     public void testAuthUser() {
 
         Response responseCheckAuth = apiCoreRequest
@@ -46,6 +53,11 @@ public class UserAuthTest extends BaseTestCase {
         Assertions.assertJsonByName(responseCheckAuth, "user_id", this.userIdOnAuth);
     }
 
+    @Test
+    @DisplayName("User authentication test(negative)")
+    @Description("Registered user trying to authenticate without token and cookie")
+    @Step("Starting test testNegativeAuthUser")
+    @Severity(value = SeverityLevel.BLOCKER)
     @ParameterizedTest
     @ValueSource(strings = {"cookie", "headers"})
     public void testNegativeAuthUser(String condition) {

@@ -1,5 +1,6 @@
 package tests;
 
+import io.qameta.allure.*;
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
@@ -7,16 +8,21 @@ import lib.ApiCoreRequest;
 import lib.Assertions;
 import lib.BaseTestCase;
 import lib.DataGenerator;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-
+@Epic("Tests for deleting user")
 class UserDeleteTest extends BaseTestCase {
     private final ApiCoreRequest apiCoreRequest = new ApiCoreRequest();
 
     @Test
+    @DisplayName("Deleting super user(negative)")
+    @Description("Super user trying to delete itself")
+    @Step("Starting test testDeleteSuperUser")
+    @Severity(value = SeverityLevel.NORMAL)
     void testDeleteSuperUser() {
         //LOGIN
         Map<String, String> authData = new HashMap<>();
@@ -41,6 +47,10 @@ class UserDeleteTest extends BaseTestCase {
     }
 
     @Test
+    @DisplayName("Deleting user with auth(positive)")
+    @Description("Registered user trying to delete itself with auth")
+    @Step("Starting test testDeleteUserWithAuth")
+    @Severity(value = SeverityLevel.BLOCKER)
     void testDeleteUserWithAuth() {
         //GENERATE USER
         Map<String, String> userData = DataGenerator.getRegistrationData();
@@ -81,6 +91,10 @@ class UserDeleteTest extends BaseTestCase {
     }
 
     @Test
+    @DisplayName("Deleting user with auth(negative) of another user")
+    @Description("Registered user trying to delete one user with token and cookie of another user")
+    @Step("Starting test testDeleteUserByAnotherUser")
+    @Severity(value = SeverityLevel.BLOCKER)
     public void testDeleteUserByAnotherUser() {
         //GENERATE FIRST USER
         Map<String, String> userData1 = DataGenerator.getRegistrationData();
