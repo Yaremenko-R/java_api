@@ -72,7 +72,6 @@ public class UserEditTest extends BaseTestCase {
                 .jsonPath();
 
         String userId = responseCreateAuth.getString("id");
-        String currentName = responseCreateAuth.getString("firstName");
 
         //EDIT
         String newName = "Changed Name";
@@ -84,5 +83,78 @@ public class UserEditTest extends BaseTestCase {
 
         Assertions.assertResponseCodeEquals(responseEditUser, 400);
         Assertions.assertResponseTextEquals(responseEditUser, "Auth token not supplied");
+    }
+
+    @Test
+    public void testEditUserByAnotherUser() {
+        //GENERATE FIRST USER
+        Map<String, String> userData1 = DataGenerator.getRegistrationData();
+
+        JsonPath responseCreateAuth1 = RestAssured
+                .given()
+                .body(userData1)
+                .post("https://playground.learnqa.ru/api/user/")
+                .jsonPath();
+
+        String userId1 = responseCreateAuth1.getString("id");
+        String currentUserName1 = responseCreateAuth1.getString("firstname");
+
+        //GENERATE SECOND USER
+        Map<String, String> userData2 = DataGenerator.getRegistrationData();
+
+        JsonPath responseCreateAuth2 = RestAssured
+                .given()
+                .body(userData2)
+                .post("https://playground.learnqa.ru/api/user/")
+                .jsonPath();
+
+        String userId2 = responseCreateAuth2.getString("id");
+        String currentUserName2 = responseCreateAuth1.getString("firstname");
+
+        //LOGIN BY FIRST USER
+        Map<String, String> authData = new HashMap<>();
+        authData.put("email", userData1.get("email"));
+        authData.put("password", userData1.get("password"));
+
+        Response responseGetAuth = apiCoreRequest
+                .makePostRequest("https://playground.learnqa.ru/api/user/login", authData);
+
+        //EDIT SECOND USER BY FIRST USER
+        String newName = "Changed Name";
+        Map<String, String> editData = new HashMap<>();
+        editData.put("firstName", newName);
+
+        String header = this.getHeader(responseGetAuth, "x-csrf-token");
+        String cookie = this.getCookie(responseGetAuth, "auth_sid");
+
+        Response responseEditUser = apiCoreRequest
+                .makePutRequestFlashRoal("https://playground.learnqa.ru/api/user/" + userId2,
+                        header,
+                        cookie,
+                        editData);
+
+        Assertions.assertResponseCodeEquals(responseEditUser, 400);
+        Assertions.assertResponseTextEquals(responseEditUser, "You are not authorized");
+
+        //GET FIRST USER DATA AFTER EDIT
+        Response responseUserData1 = apiCoreRequest
+                .makeGetRequest("https://playground.learnqa.ru/api/user/" + userId1,
+                        header,
+                        cookie);
+
+        Assertions.assertJsonByName(responseUserData1, "firstName", currentUserName1);
+        Assertions.assertJsonHasField(responseUserData1, "username");
+        String[] expectedFields = {"firstName", "lastName", "email"};
+        Assertions.assertJsonHasFields(responseUserData1, expectedFields);
+
+
+        //GET SECOND USER FIRSTNAME AFTER EDIT
+        Response responseUserData2 = apiCoreRequest
+                .makeGetRequestWithoutTokenAndCookie("https://playground.learnqa.ru/api/user/" + userId2);
+
+        Assertions.assertJsonByName(responseUserData2, "firstName", currentUserName2);
+        Assertions.assertJsonHasField(responseUserData2, "username");
+        String[] unexpectedFields = {"firstName", "lastName", "email"};
+        Assertions.assertJsonHasNotFields(responseUserData2, unexpectedFields);
     }
 }
