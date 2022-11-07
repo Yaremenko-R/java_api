@@ -1,10 +1,12 @@
 package lib;
 
-import io.restassured.http.Header;
-import io.restassured.response.Response;
 import io.qameta.allure.Step;
 import io.qameta.allure.restassured.AllureRestAssured;
+import io.restassured.http.Header;
+import io.restassured.response.Response;
+
 import java.util.Map;
+
 import static io.restassured.RestAssured.given;
 
 public class ApiCoreRequest {
@@ -71,6 +73,16 @@ public class ApiCoreRequest {
                 .filter(new AllureRestAssured())
                 .body(authData)
                 .put(url)
+                .andReturn();
+    }
+
+    @Step("Make a DELETE-request with token and cookie")
+    public Response makeDeleteRequestWithTokenAndCookie(String url, String header, String cookie) {
+        return given()
+                .filter(new AllureRestAssured())
+                .header("x-csrf-token", header)
+                .cookie("auth_sid", cookie)
+                .delete(url)
                 .andReturn();
     }
 }
