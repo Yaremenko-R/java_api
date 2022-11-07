@@ -157,4 +157,50 @@ public class UserEditTest extends BaseTestCase {
         String[] unexpectedFields = {"firstName", "lastName", "email"};
         Assertions.assertJsonHasNotFields(responseUserData2, unexpectedFields);
     }
+
+    @Test
+    public void testEditUserEmailWithAuth() {
+        //GENERATE USER
+        Map<String, String> userData = DataGenerator.getRegistrationData();
+
+        JsonPath responseCreateAuth = RestAssured
+                .given()
+                .body(userData)
+                .post("https://playground.learnqa.ru/api/user/")
+                .jsonPath();
+
+        String userId = responseCreateAuth.getString("id");
+
+        //LOGIN
+        Map<String, String> authData = new HashMap<>();
+        authData.put("email", userData.get("email"));
+        authData.put("password", userData.get("password"));
+
+        Response responseGetAuth = apiCoreRequest
+                .makePostRequest("https://playground.learnqa.ru/api/user/login", authData);
+
+        //EDIT
+        String newEmail = "i.v.got.the.power";
+        Map<String, String> editData = new HashMap<>();
+        editData.put("email", newEmail);
+
+        String header = this.getHeader(responseGetAuth, "x-csrf-token");
+        String cookie = this.getCookie(responseGetAuth, "auth_sid");
+
+        Response responseEditUser = apiCoreRequest
+                .makePutRequestFlashRoal("https://playground.learnqa.ru/api/user/" + userId,
+                        header,
+                        cookie,
+                        editData);
+
+        //GET
+        Response responseUserData = apiCoreRequest
+                .makeGetRequest("https://playground.learnqa.ru/api/user/" + userId,
+                        header,
+                        cookie);
+
+        Assertions.assertResponseCodeEquals(responseEditUser, 400);
+        Assertions.assertResponseTextEquals(responseEditUser, "Invalid email format");
+    }
+
 }
