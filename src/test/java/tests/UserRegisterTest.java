@@ -72,7 +72,6 @@ public class UserRegisterTest extends BaseTestCase {
         Assertions.assertResponseTextEquals(responseCreateAuth, "Invalid email format");
     }
 
-    @Test
     @DisplayName("Creating user with absence one of the mandatory fields(negative)")
     @Description("Trying to create new user without one of the mandatory fields")
     @Step("Starting test testCreateUserWithoutOneParameter")

@@ -53,7 +53,6 @@ public class UserAuthTest extends BaseTestCase {
         Assertions.assertJsonByName(responseCheckAuth, "user_id", this.userIdOnAuth);
     }
 
-    @Test
     @DisplayName("User authentication test(negative)")
     @Description("Registered user trying to authenticate without token and cookie")
     @Step("Starting test testNegativeAuthUser")
