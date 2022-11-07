@@ -64,4 +64,13 @@ public class ApiCoreRequest {
                 .put(url)
                 .andReturn();
     }
+
+    @Step("Make a PUT-request without token and cookie")
+    public Response makePutRequestWithoutTokenAndCookie(String url, Map<String, String> authData) {
+        return given()
+                .filter(new AllureRestAssured())
+                .body(authData)
+                .put(url)
+                .andReturn();
+    }
 }
