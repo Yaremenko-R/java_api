@@ -112,50 +112,62 @@ public class UserEditTest extends BaseTestCase {
         String currentUserName2 = responseCreateAuth1.getString("firstname");
 
         //LOGIN BY FIRST USER
-        Map<String, String> authData = new HashMap<>();
-        authData.put("email", userData1.get("email"));
-        authData.put("password", userData1.get("password"));
+        Map<String, String> authData1 = new HashMap<>();
+        authData1.put("email", userData1.get("email"));
+        authData1.put("password", userData1.get("password"));
 
-        Response responseGetAuth = apiCoreRequest
-                .makePostRequest("https://playground.learnqa.ru/api/user/login", authData);
+        Response responseGetAuth1 = apiCoreRequest
+                .makePostRequest("https://playground.learnqa.ru/api/user/login", authData1);
+
+        String header1 = this.getHeader(responseGetAuth1, "x-csrf-token");
+        String cookie1 = this.getCookie(responseGetAuth1, "auth_sid");
 
         //EDIT SECOND USER BY FIRST USER
         String newName = "Changed Name";
         Map<String, String> editData = new HashMap<>();
         editData.put("firstName", newName);
 
-        String header = this.getHeader(responseGetAuth, "x-csrf-token");
-        String cookie = this.getCookie(responseGetAuth, "auth_sid");
-
         Response responseEditUser = apiCoreRequest
                 .makePutRequestFlashRoal("https://playground.learnqa.ru/api/user/" + userId2,
-                        header,
-                        cookie,
+                        header1,
+                        cookie1,
                         editData);
 
-        Assertions.assertResponseCodeEquals(responseEditUser, 400);
+        Assertions.assertResponseCodeEquals(responseEditUser, 403);
         Assertions.assertResponseTextEquals(responseEditUser, "You are not authorized");
 
         //GET FIRST USER DATA AFTER EDIT
         Response responseUserData1 = apiCoreRequest
                 .makeGetRequest("https://playground.learnqa.ru/api/user/" + userId1,
-                        header,
-                        cookie);
+                        header1,
+                        cookie1);
 
         Assertions.assertJsonByName(responseUserData1, "firstName", currentUserName1);
-        Assertions.assertJsonHasField(responseUserData1, "username");
-        String[] expectedFields = {"firstName", "lastName", "email"};
-        Assertions.assertJsonHasFields(responseUserData1, expectedFields);
+        String[] expectedFields1 = {"username", "firstName", "lastName", "email"};
+        Assertions.assertJsonHasFields(responseUserData1, expectedFields1);
 
+        //GET SECOND USER DATA AFTER EDIT
 
-        //GET SECOND USER FIRSTNAME AFTER EDIT
+        //LOGIN BY SECOND USER
+        Map<String, String> authData2 = new HashMap<>();
+        authData2.put("email", userData2.get("email"));
+        authData2.put("password", userData2.get("password"));
+
+        Response responseGetAuth2 = apiCoreRequest
+                .makePostRequest("https://playground.learnqa.ru/api/user/login", authData2);
+
+        String header2 = this.getHeader(responseGetAuth1, "x-csrf-token");
+        String cookie2 = this.getCookie(responseGetAuth1, "auth_sid");
+
+        //GET SECOND USER INFO
         Response responseUserData2 = apiCoreRequest
-                .makeGetRequestWithoutTokenAndCookie("https://playground.learnqa.ru/api/user/" + userId2);
+                .makeGetRequest("https://playground.learnqa.ru/api/user/" + userId1,
+                        header2,
+                        cookie2);
 
-        Assertions.assertJsonByName(responseUserData2, "firstName", currentUserName2);
-        Assertions.assertJsonHasField(responseUserData2, "username");
-        String[] unexpectedFields = {"firstName", "lastName", "email"};
-        Assertions.assertJsonHasNotFields(responseUserData2, unexpectedFields);
+        Assertions.assertJsonByName(responseUserData2, "firstName", newName);
+        String[] expectedFields2 = {"username", "firstName", "lastName", "email"};
+        Assertions.assertJsonHasFields(responseUserData1, expectedFields2);
     }
 
     @Test
